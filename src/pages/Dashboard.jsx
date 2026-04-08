@@ -15,6 +15,7 @@ import {
 } from 'chart.js'
 import useCallLogs from '../hooks/useCallLogs'
 import useCallsByHour from '../hooks/useCallsByHour'
+import useFunnelRange from '../hooks/useFunnelRange'
 import { CALLS_API, CONVERSATIONS_API, CONTACTS_API } from '../constants/api'
 
 ChartJS.register(
@@ -50,6 +51,12 @@ export default function Dashboard() {
   const { business, afterHours, totalCalls: hourTotal, loading: hourLoading, error: hourError, fetchForRange } = useCallsByHour()
 
   useEffect(() => { fetchForRange(sevenDaysAgoStr, todayStr) }, [])
+
+  // Funnel charts — calls & chat pipelines
+  const [funnelStart, setFunnelStart] = useState(sevenDaysAgoStr)
+  const [funnelEnd,   setFunnelEnd]   = useState(todayStr)
+  const { data: funnelData, loading: funnelLoading, error: funnelError, fetchForRange: fetchFunnel } = useFunnelRange()
+  useEffect(() => { fetchFunnel(sevenDaysAgoStr, todayStr) }, [])
 
   useEffect(() => {
     async function fetchWebChatsCount() {
@@ -113,6 +120,15 @@ export default function Dashboard() {
   const avgDurationSec = callLogs.length
     ? Math.round(callLogs.reduce((s, c) => s + (c.duration || 0), 0) / callLogs.length)
     : 0
+
+  // Business metric derivations
+  const totalLeads = appointmentsTotal ?? 0
+  const conversionRate = total && appointmentsTotal
+    ? ((appointmentsTotal / total) * 100).toFixed(1) + '%'
+    : '—'
+  const salesRevenue = appointmentsTotal
+    ? '$' + (appointmentsTotal * 250).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : '$0.00'
 
   const labels = callLogs.map(c =>
     new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -182,6 +198,13 @@ export default function Dashboard() {
           <KpiCard label="Web Chats" value={webChatsTotal} accent="text-accentGreen" loading={webChatsLoading} />
           <KpiCard label="Total Duration" value={`${totalDurationMin} min`} accent="text-blue-400" loading={loading} />
           <KpiCard label="Actions Triggered" value={totalActions} accent="text-orange-400" loading={loading} />
+        </section>
+
+        {/* KPI Row 2 — Business metrics */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <KpiCard label="Total Leads" value={totalLeads || '—'} accent="text-violet-400" loading={appointmentsLoading} />
+          <KpiCard label="Conversion Rate" value={conversionRate} accent="text-accentGreen" loading={loading || appointmentsLoading} />
+          <KpiCard label="Sales Revenue" value={salesRevenue} accent="text-yellow-400" loading={appointmentsLoading} />
         </section>
 
         {/* Line Chart */}
@@ -526,6 +549,265 @@ export default function Dashboard() {
             <KpiCard label="Avg Call Duration" value={`${avgDurationSec}s`} accent="text-purple-400" loading={loading} />
           </div>
         </section>
+
+        {/* ── Funnel Pipeline Charts ───────────────────────────────────── */}
+        <section className="kpi-card p-6 rounded-xl mb-6">
+          {/* Header + shared date picker */}
+          <div className="flex items-start justify-between flex-wrap gap-3 mb-5">
+            <div>
+              <div className="flex items-center space-x-2">
+                <i className="fa-solid fa-filter text-primary text-lg" />
+                <h3 className="font-semibold text-lg">Pipeline Funnel</h3>
+              </div>
+              <p className="text-textMuted text-sm mt-0.5">Calls & Chat — Leads → Converted over time</p>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1">
+                <label className="text-xs text-textMuted">From</label>
+                <input
+                  type="date"
+                  value={funnelStart}
+                  max={funnelEnd || todayStr}
+                  onChange={e => setFunnelStart(e.target.value)}
+                  className="text-sm rounded px-2 py-1"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #27272a', color: '#fff' }}
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                <label className="text-xs text-textMuted">To</label>
+                <input
+                  type="date"
+                  value={funnelEnd}
+                  min={funnelStart}
+                  max={todayStr}
+                  onChange={e => setFunnelEnd(e.target.value)}
+                  className="text-sm rounded px-2 py-1"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #27272a', color: '#fff' }}
+                />
+              </div>
+              <button
+                onClick={() => fetchFunnel(funnelStart, funnelEnd)}
+                disabled={!funnelStart || !funnelEnd || funnelLoading}
+                className="px-3 py-1.5 rounded bg-primary text-white text-xs font-medium hover:bg-primary/80 disabled:opacity-40"
+              >
+                {funnelLoading ? 'Loading…' : 'Apply'}
+              </button>
+            </div>
+          </div>
+
+          {funnelError && <div className="text-red-400 text-xs mb-3">{funnelError}</div>}
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+            {/* LEFT — Calls funnel */}
+            <div>
+              <div className="flex items-center space-x-2 mb-3">
+                <i className="fa-solid fa-phone text-primary" />
+                <span className="font-medium">Calls Pipeline</span>
+                {funnelData && (
+                  <span className="ml-auto text-xs text-textMuted">
+                    {funnelData.totalCalls} total calls
+                  </span>
+                )}
+              </div>
+              <div style={{ height: 300 }}>
+                {funnelLoading
+                  ? <div className="h-full rounded placeholder-glow" />
+                  : !funnelData
+                    ? <div className="h-full flex items-center justify-center text-textMuted text-sm">No data</div>
+                    : <Bar
+                        data={{
+                          labels: funnelData.labels,
+                          datasets: [
+                            {
+                              label: 'Total Calls',
+                              data: funnelData.callsTotal,
+                              backgroundColor: 'rgba(139,92,246,0.75)',
+                              hoverBackgroundColor: 'rgba(139,92,246,1)',
+                              borderRadius: 4,
+                              borderSkipped: false,
+                            },
+                            {
+                              label: 'Leads',
+                              data: funnelData.callsLeads,
+                              backgroundColor: 'rgba(96,165,250,0.75)',
+                              hoverBackgroundColor: 'rgba(96,165,250,1)',
+                              borderRadius: 4,
+                              borderSkipped: false,
+                            },
+                            {
+                              label: 'Converted',
+                              data: funnelData.callsConverted,
+                              backgroundColor: 'rgba(190,242,100,0.75)',
+                              hoverBackgroundColor: 'rgba(190,242,100,1)',
+                              borderRadius: 4,
+                              borderSkipped: false,
+                            },
+                          ]
+                        }}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: 'top',
+                              labels: {
+                                color: '#a1a1aa',
+                                font: { size: 11 },
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 14,
+                              }
+                            },
+                            tooltip: {
+                              backgroundColor: '#18181b',
+                              borderColor: '#27272a',
+                              borderWidth: 1,
+                              titleColor: '#a1a1aa',
+                              bodyColor: '#ffffff',
+                              padding: 10,
+                            }
+                          },
+                          scales: {
+                            x: {
+                              grid: { display: false },
+                              ticks: { color: '#a1a1aa', font: { size: 11 } }
+                            },
+                            y: {
+                              grid: { color: 'rgba(255,255,255,0.04)' },
+                              ticks: { color: '#a1a1aa', font: { size: 11 } },
+                              beginAtZero: true,
+                            }
+                          }
+                        }}
+                      />
+                }
+              </div>
+              {/* Summary strip */}
+              {funnelData && (
+                <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-bordercolor text-center">
+                  <div>
+                    <div className="text-xl font-bold text-primary">{funnelData.totalCalls}</div>
+                    <div className="text-xs text-textMuted mt-0.5">Total Calls</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-blue-400">{funnelData.callsLeads.reduce((a,b)=>a+b,0)}</div>
+                    <div className="text-xs text-textMuted mt-0.5">Leads</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-accentGreen">{funnelData.callsConverted.reduce((a,b)=>a+b,0)}</div>
+                    <div className="text-xs text-textMuted mt-0.5">Converted</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT — Chat funnel */}
+            <div>
+              <div className="flex items-center space-x-2 mb-3">
+                <i className="fa-solid fa-comments text-accentGreen" />
+                <span className="font-medium">Chat Pipeline</span>
+                {funnelData && (
+                  <span className="ml-auto text-xs text-textMuted">
+                    {funnelData.totalChats} total chats
+                  </span>
+                )}
+              </div>
+              <div style={{ height: 300 }}>
+                {funnelLoading
+                  ? <div className="h-full rounded placeholder-glow" />
+                  : !funnelData
+                    ? <div className="h-full flex items-center justify-center text-textMuted text-sm">No data</div>
+                    : <Bar
+                        data={{
+                          labels: funnelData.labels,
+                          datasets: [
+                            {
+                              label: 'Total Chats',
+                              data: funnelData.chatsTotal,
+                              backgroundColor: 'rgba(190,242,100,0.75)',
+                              hoverBackgroundColor: 'rgba(190,242,100,1)',
+                              borderRadius: 4,
+                              borderSkipped: false,
+                            },
+                            {
+                              label: 'Leads',
+                              data: funnelData.chatLeads,
+                              backgroundColor: 'rgba(251,191,36,0.75)',
+                              hoverBackgroundColor: 'rgba(251,191,36,1)',
+                              borderRadius: 4,
+                              borderSkipped: false,
+                            },
+                            {
+                              label: 'Converted',
+                              data: funnelData.chatConverted,
+                              backgroundColor: 'rgba(96,165,250,0.75)',
+                              hoverBackgroundColor: 'rgba(96,165,250,1)',
+                              borderRadius: 4,
+                              borderSkipped: false,
+                            },
+                          ]
+                        }}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: 'top',
+                              labels: {
+                                color: '#a1a1aa',
+                                font: { size: 11 },
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 14,
+                              }
+                            },
+                            tooltip: {
+                              backgroundColor: '#18181b',
+                              borderColor: '#27272a',
+                              borderWidth: 1,
+                              titleColor: '#a1a1aa',
+                              bodyColor: '#ffffff',
+                              padding: 10,
+                            }
+                          },
+                          scales: {
+                            x: {
+                              grid: { display: false },
+                              ticks: { color: '#a1a1aa', font: { size: 11 } }
+                            },
+                            y: {
+                              grid: { color: 'rgba(255,255,255,0.04)' },
+                              ticks: { color: '#a1a1aa', font: { size: 11 } },
+                              beginAtZero: true,
+                            }
+                          }
+                        }}
+                      />
+                }
+              </div>
+              {/* Summary strip */}
+              {funnelData && (
+                <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-bordercolor text-center">
+                  <div>
+                    <div className="text-xl font-bold text-accentGreen">{funnelData.totalChats}</div>
+                    <div className="text-xs text-textMuted mt-0.5">Total Chats</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-yellow-400">{funnelData.chatLeads.reduce((a,b)=>a+b,0)}</div>
+                    <div className="text-xs text-textMuted mt-0.5">Leads</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-blue-400">{funnelData.chatConverted.reduce((a,b)=>a+b,0)}</div>
+                    <div className="text-xs text-textMuted mt-0.5">Converted</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
+        </section>
+
       </main>
     </div>
   )
