@@ -524,11 +524,6 @@ export default function Dashboard() {
           {/* KPI Row 2 — moved here to fill the right column */}
           <div className="flex flex-col gap-6">
             <KpiCard label="Avg Call Duration" value={`${avgDurationSec}s`} accent="text-purple-400" loading={loading} />
-            <div className="kpi-card p-5 rounded-xl flex items-center space-x-4">
-              <div className="text-xs text-textMuted uppercase tracking-widest">Quick Links</div>
-              <a href="/aicalls" className="text-sm text-primary hover:underline">AI Calls →</a>
-              <a href="/leads" className="text-sm text-primary hover:underline">Leads →</a>
-            </div>
           </div>
         </section>
       </main>
