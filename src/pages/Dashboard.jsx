@@ -204,7 +204,7 @@ export default function Dashboard() {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <KpiCard label="Total Leads" value={totalLeads || '—'} accent="text-violet-400" loading={appointmentsLoading} />
           <KpiCard label="Conversion Rate" value={conversionRate} accent="text-accentGreen" loading={loading || appointmentsLoading} />
-          <KpiCard label="Sales Revenue" value={salesRevenue} accent="text-yellow-400" loading={appointmentsLoading} />
+          <KpiCard label="Sales Revenue" value="N/A" accent="text-yellow-400" loading={appointmentsLoading} />
         </section>
 
         {/* Line Chart */}
