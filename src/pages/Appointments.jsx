@@ -134,7 +134,7 @@ export default function Appointments() {
                     <th className="p-3 text-left">Email</th>
                     <th className="p-3 text-left">Appointment</th>
                     <th className="p-3 text-left">Status</th>
-                    <th className="p-3 text-left">Assigned To</th>
+                    {/* <th className="p-3 text-left">Assigned To</th> */}
                     <th className="p-3 text-left">Appointment Time</th>
                   </tr>
                 </thead>
@@ -155,7 +155,7 @@ export default function Appointments() {
                       <td className="p-3 text-textMuted">{c.email || '—'}</td>
                       <td className="p-3 font-medium">{a.title || '—'}</td>
                       <td className="p-3"><StatusBadge status={a.appointmentStatus} /></td>
-                      <td className="p-3">
+                      {/* <td className="p-3">
                         {assignedUser ? (
                           <div className="flex items-center space-x-2">
                             <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold flex-shrink-0">
@@ -169,7 +169,7 @@ export default function Appointments() {
                         ) : (
                           <span className="text-textMuted text-xs">—</span>
                         )}
-                      </td>
+                      </td> */}
                       <td className="p-3 text-textMuted whitespace-nowrap">{formatDateTime(a.startTime)}</td>
                     </tr>
                     )
