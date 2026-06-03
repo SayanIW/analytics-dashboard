@@ -264,7 +264,7 @@ Date range filter bar (in the page header, right-aligned):
 
 | Column | Source Field |
 |---|---|
-| Agent Name | `log.agentName` or `log.agentId` |
+| Agent ID | `log.agentName` or `log.agentId` |
 | Contact Name | `log.extractedData?.name` |
 | Phone Number | `log.fromNumber` |
 | Date and Time | `log.createdAt` (formatted: `DD Mon YYYY` + time) |

@@ -189,7 +189,7 @@ export default function Dashboard() {
     <div className="flex min-h-screen">
       <Sidebar />
       <main className="flex-1 p-8 overflow-y-auto">
-        <h1 className="text-2xl font-bold mb-1">JarrettFord Dashboard</h1>
+        <h1 className="text-2xl font-bold mb-1">Jarrett Ford Dashboard</h1>
         <p className="text-textMuted mb-8">Monitor your AI call performance</p>
 
         {/* KPI Row 1 */}
