@@ -294,7 +294,7 @@ Date range filter bar (in the page header, right-aligned):
 **Route**: `/leads.html`  
 **Script**: `leads.js`  
 **Title**: "Leads"  
-**Subtitle**: "Manage your contacts from HighLevel"
+**Subtitle**: "Manage your contacts from VoyceProfit"
 
 #### Search
 
@@ -334,7 +334,7 @@ Each row triggers a separate appointment lookup after the row renders:
 **Route**: `/appointments.html`  
 **Script**: `appointments.js`  
 **Title**: "Appointments"  
-**Subtitle**: "Scheduled appointments from HighLevel contacts"  
+**Subtitle**: "Scheduled appointments from VoyceProfit contacts"  
 **Active accent**: `accentGreen` (#bef264) instead of `primary` purple
 
 #### Flow
@@ -402,7 +402,7 @@ Clicking "View Info" opens a chat-style modal:
 **Route**: `/socialmessages.html`  
 **Script**: `socialmessages.js`  
 **Title**: "Social Messages"  
-**Subtitle**: "Facebook messages via HighLevel"  
+**Subtitle**: "Facebook messages via VoyceProfit"  
 **Accent**: Facebook Blue `#1877F2`
 
 Identical layout and modal to Web Chats. Differences:

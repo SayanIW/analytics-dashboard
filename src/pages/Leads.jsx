@@ -60,7 +60,7 @@ export default function Leads(){
       <Sidebar />
       <main className="flex-1 p-8 overflow-y-auto">
         <h1 className="text-2xl font-bold mb-4">Leads</h1>
-        <p className="text-textMuted mb-6">Manage your contacts from HighLevel</p>
+        <p className="text-textMuted mb-6">Manage your contacts from VoyceProfit</p>
 
         <div className="flex items-center justify-between mb-4">
           <div className="w-1/3">
