@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tail -20 \"/mnt/c/Users/cepl/../../wsl.localhost/Ubuntu/home/cepl/dev/voyceprofit/analytics-dashboard/src/pages/Dashboard.jsx\")",
+      "Read(//mnt/c/wsl.localhost/Ubuntu/home/cepl/dev/voyceprofit/analytics-dashboard/src/pages/**)"
+    ]
+  }
+}

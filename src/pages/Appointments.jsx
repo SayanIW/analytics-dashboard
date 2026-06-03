@@ -120,7 +120,7 @@ export default function Appointments() {
       <main className="flex-1 p-8 overflow-y-auto">
         {/* Header with accentGreen accent */}
         <h1 className="text-2xl font-bold mb-1" style={{ color: '#bef264' }}>Appointments</h1>
-        <p className="text-textMuted mb-8">Scheduled appointments from HighLevel contacts</p>
+        <p className="text-textMuted mb-8">Scheduled appointments from VoyceProfit contacts</p>
 
         <div className="kpi-card p-4 rounded-xl">
           {loading ? (

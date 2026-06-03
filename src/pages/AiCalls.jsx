@@ -85,7 +85,7 @@ export default function AiCalls() {
               <table className="w-full table-auto">
                 <thead>
                   <tr>
-                    <th className="p-3 text-left">Agent Name</th>
+                    <th className="p-3 text-left">Agent ID</th>
                     <th className="p-3 text-left">Contact Name</th>
                     <th className="p-3 text-left">Phone Number</th>
                     <th className="p-3 text-left">Date & Time</th>

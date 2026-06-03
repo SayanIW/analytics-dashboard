@@ -55,7 +55,7 @@ export default function SocialMessages() {
           <h1 className="text-2xl font-bold" style={{ color: FB_BLUE }}>Social Messages</h1>
           {!loading && <span className="text-sm text-textMuted">{total} total</span>}
         </div>
-        <p className="text-textMuted mb-8">Facebook messages via HighLevel</p>
+        <p className="text-textMuted mb-8">Facebook messages via VoyceProfit</p>
 
         <div className="kpi-card p-4 rounded-xl">
           {loading ? (

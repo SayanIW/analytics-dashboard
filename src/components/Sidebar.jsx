@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 export default function Sidebar() {
   const { logout } = useAuth()
   const location = useLocation()
+  const currentYear = new Date().getFullYear()
   const [aiCallsOpen, setAiCallsOpen] = useState(
     location.pathname === '/aicalls'
   )
@@ -23,7 +24,7 @@ export default function Sidebar() {
         <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
           <i className="fa-solid fa-microphone-lines text-sm" />
         </div>
-        <span className="font-bold text-sm">JarrettFord</span>
+        <span className="font-bold text-sm">Jarrett Ford</span>
       </div>
 
       <nav className="flex-1 space-y-1">
@@ -109,6 +110,9 @@ export default function Sidebar() {
           <i className="fa-solid fa-right-from-bracket w-4 text-center" />
           <span>Sign Out</span>
         </button>
+        <p className="text-center text-[10px] text-textMuted/50 mt-3 leading-tight">
+          &copy; {currentYear} Reserved<br />Powered by <a href="https://www.voyceprofit.ai/" target="_blank" rel="noreferrer" className="hover:text-textMuted underline">VoyceProfit</a>
+        </p>
       </div>
     </aside>
   )
